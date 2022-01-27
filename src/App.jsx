@@ -23,36 +23,48 @@ const theme = createTheme({
       },
     },
     MuiInputLabel: {
-      root: { color: '#fff', fontWeight: 'normal' },
+      styleOverrides: {
+        root: { color: '#fff', fontWeight: 'normal' },
+      },
     },
     MuiInput: {
-      underline: {
-        '&:before': {
-          borderBottom: '1px solid #FF7661',
-        },
-        '&:hover': {
-          borderBottom: '1px solid #FF7661',
+      styleOverrides: {
+        underline: {
+          '&:before': {
+            borderBottom: '1px solid #FF7661',
+          },
+          '&:hover': {
+            borderBottom: '1px solid #FF7661',
+          },
         },
       },
     },
     MuiFormLabel: {
-      root: {
-        color: '#fff',
-        fontWeight: 600,
-        paddingBottom: '16px',
+      styleOverrides: {
+        root: {
+          color: '#fff',
+          fontWeight: 600,
+          paddingBottom: '16px',
+        },
       },
     },
     MuiRadio: {
-      root: {
-        color: '#fff',
+      styleOverrides: {
+        root: {
+          color: '#fff',
+        },
       },
     },
     MuiIconButton: {
-      label: { color: '#FF7661' },
+      styleOverrides: {
+        label: { color: '#FF7661' },
+      },
     },
     MuiDrawer: {
-      paper: {
-        backgroundColor: 'red',
+      styleOverrides: {
+        paper: {
+          backgroundColor: 'red',
+        },
       },
     },
   },
