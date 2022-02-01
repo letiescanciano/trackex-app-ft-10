@@ -19,7 +19,7 @@ const FormWrapper = styled.div`
   width: 380px;
   height: 100vh;
   overflow: scroll;
-  background-color: #252f3d;
+  background-color: teal;
   color: white;
 `
 const FieldsWrapper = styled.div`
@@ -38,13 +38,21 @@ const categories = [
   { label: 'Clothes', value: 'clothes' },
   { label: 'Electronics', value: 'electronics' },
   { label: 'Groceries', value: 'groceries' },
+  { label: 'Salary', value: 'salary' },
 ]
 const types = [
   { label: 'Income', value: 'income' },
   { label: 'Expense', value: 'expense' },
 ]
 
-const AddTransactionDrawer = ({ isOpen, onClose, saveTransaction }) => {
+const TransactionDrawer = ({
+  isOpen,
+  onClose,
+  saveTransaction,
+  mode,
+  selectedTransaction,
+  editTransaction,
+}) => {
   const transactionSchema = Yup.object().shape({
     name: Yup.string().min(2, 'Too short').required('Required'),
     date: Yup.string().min(10, 'Too short').required('Required'),
@@ -52,26 +60,32 @@ const AddTransactionDrawer = ({ isOpen, onClose, saveTransaction }) => {
       .typeError('Amount should be a number')
       .required('Required'),
   })
+
+  console.log('selectedTransaction', selectedTransaction)
+  const initialValues =
+    mode === 'add'
+      ? {
+          name: '',
+          date: '',
+          amount: '',
+          category: 'eating_out',
+          type: 'expense',
+        }
+      : selectedTransaction
   return (
     <Drawer anchor='right' open={isOpen} onClose={onClose}>
       <FormWrapper>
-        <h1>New transaction</h1>
+        <h1>{mode === 'add' ? 'New' : 'Edit'} transaction</h1>
         <Formik
-          initialValues={{
-            name: '',
-            date: '',
-            amount: '',
-            category: 'eating_out',
-            type: 'expense',
-          }}
+          initialValues={initialValues}
           validationSchema={transactionSchema}
           onSubmit={values => {
             console.log(values)
-            saveTransaction(values)
+            mode === 'add' ? saveTransaction(values) : editTransaction(values)
             onClose()
           }}
         >
-          {props => {
+          {({ values, handleChange, errors, isValid, isSubmitting }) => {
             return (
               <>
                 <Form>
@@ -80,22 +94,22 @@ const AddTransactionDrawer = ({ isOpen, onClose, saveTransaction }) => {
                       fullWidth
                       variant='standard'
                       name='name'
-                      value={props.values.name}
-                      onChange={props.handleChange}
+                      value={values.name}
+                      onChange={handleChange}
                       label='Name'
-                      error={Boolean(props.errors.name)}
-                      helperText={props.errors.name}
+                      error={Boolean(errors.name)}
+                      helperText={errors.name}
                     />
 
                     <TextField
                       fullWidth
                       variant='standard'
                       name='date'
-                      value={props.values.date}
-                      onChange={props.handleChange}
+                      value={values.date}
+                      onChange={handleChange}
                       label='Date'
-                      error={Boolean(props.errors.date)}
-                      helperText={props.errors.date}
+                      error={Boolean(errors.date)}
+                      helperText={errors.date}
                     />
 
                     <TextField
@@ -103,11 +117,11 @@ const AddTransactionDrawer = ({ isOpen, onClose, saveTransaction }) => {
                       variant='standard'
                       name='amount'
                       type='number'
-                      value={props.values.amount}
-                      onChange={props.handleChange}
+                      value={values.amount}
+                      onChange={handleChange}
                       label='Amount'
-                      error={Boolean(props.errors.amount)}
-                      helperText={props.errors.amount}
+                      error={Boolean(errors.amount)}
+                      helperText={errors.amount}
                     />
                   </FieldsWrapper>
                   <div>
@@ -115,9 +129,9 @@ const AddTransactionDrawer = ({ isOpen, onClose, saveTransaction }) => {
                       <FormLabel id='category'>Category</FormLabel>
                       <RadioGroup
                         aria-labelledby='category'
-                        defaultValue='eating_out'
                         name='category'
-                        onChange={props.handleChange}
+                        value={values.category}
+                        onChange={handleChange}
                       >
                         {categories.map((category, index) => {
                           return (
@@ -136,8 +150,9 @@ const AddTransactionDrawer = ({ isOpen, onClose, saveTransaction }) => {
                       <RadioGroup
                         aria-labelledby='type'
                         defaultValue='expense'
+                        value={values.type}
                         name='type'
-                        onChange={props.handleChange}
+                        onChange={handleChange}
                       >
                         {types.map((type, index) => {
                           return (
@@ -159,7 +174,7 @@ const AddTransactionDrawer = ({ isOpen, onClose, saveTransaction }) => {
                     <Button
                       type='submit'
                       variant='contained'
-                      disabled={props.isSubmitting || !props.isValid}
+                      disabled={isSubmitting || !isValid}
                     >
                       Save
                     </Button>
@@ -175,4 +190,4 @@ const AddTransactionDrawer = ({ isOpen, onClose, saveTransaction }) => {
   )
 }
 
-export { AddTransactionDrawer }
+export { TransactionDrawer }

@@ -6,7 +6,7 @@ import Button from '@mui/material/Button'
 
 import { Edit, DeleteForever } from '@mui/icons-material'
 
-import { AddTransactionDrawer } from '../Drawer'
+import { TransactionDrawer } from '../Drawer'
 const Table = styled.table`
   width: 100%;
   text-align: left;
@@ -34,7 +34,10 @@ const ActionsCell = styled.td`
 
 const TransactionsList = () => {
   const [transactions, setTransactions] = useState([])
-  const [openDrawer, setOpenDrawer] = useState(false)
+  const [isOpenDrawer, setIsOpenDrawer] = useState(false)
+
+  const [mode, setMode] = useState('add')
+  const [selectedTransaction, setSelectedTransaction] = useState(null)
 
   useEffect(() => {
     setTransactions(data)
@@ -52,13 +55,45 @@ const TransactionsList = () => {
     }
     setTransactions([...transactions, newTransaction])
   }
+  const onCloseDrawer = () => setIsOpenDrawer(false)
 
+  const handleEdit = id => {
+    console.log('Edit transaction')
+    // get data from the selected Transaction
+    console.log('transaction id', id)
+    // open the drawer
+    setMode('edit')
+    setIsOpenDrawer(true)
+    // Fill the form with the selected transaction data
+    const selectedTransaction = transactions.find(
+      transaction => transaction.id === id
+    )
+    setSelectedTransaction(selectedTransaction)
+  }
+
+  const editTransaction = values => {
+    console.log('editTransaction', values)
+    //1. Find the transaction index to edit in the transactions array
+    const transactionIndex = transactions.findIndex(
+      transaction => transaction.id === values.id
+    )
+    // 2. We make a copy of our state
+    const _transactions = [...transactions]
+
+    // 3. Replace the transaction that we edited
+    _transactions[transactionIndex] = values
+
+    //4. Update our state
+    setTransactions(_transactions)
+    setSelectedTransaction(null)
+  }
   return (
     <main style={{ width: '100%', padding: '32px' }}>
       <Button
         variant='contained'
         onClick={() => {
-          setOpenDrawer(true)
+          setMode('add')
+          setIsOpenDrawer(true)
         }}
       >
         + Add transaction
@@ -88,7 +123,7 @@ const TransactionsList = () => {
                 <ActionsCell>
                   <Edit
                     onClick={() => {
-                      console.log('Edit transaction')
+                      handleEdit(transaction.id)
                     }}
                   />
                   <DeleteForever
@@ -103,10 +138,13 @@ const TransactionsList = () => {
           })}
         </tbody>
       </Table>
-      <AddTransactionDrawer
+      <TransactionDrawer
         saveTransaction={saveTransaction}
-        isOpen={openDrawer}
-        onClose={() => setOpenDrawer(false)}
+        isOpen={isOpenDrawer}
+        onClose={onCloseDrawer}
+        mode={mode}
+        selectedTransaction={selectedTransaction}
+        editTransaction={editTransaction}
       />
     </main>
   )
