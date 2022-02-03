@@ -3,6 +3,7 @@ import './App.css'
 import { NavBar } from './components/NavBar'
 import { TransactionsList } from './components/TransactionsList'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
+import { TrackexProvider } from './contexts/trackexContext'
 
 const theme = createTheme({
   palette: {
@@ -73,8 +74,10 @@ const App = () => {
   return (
     <ThemeProvider theme={theme}>
       <div className='layout'>
-        <NavBar />
-        <TransactionsList />
+        <TrackexProvider>
+          <NavBar />
+          <TransactionsList />
+        </TrackexProvider>
       </div>
     </ThemeProvider>
   )

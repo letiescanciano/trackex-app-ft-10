@@ -1,12 +1,18 @@
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import data from './data'
 import styled from 'styled-components'
 import { v4 as uuidv4 } from 'uuid'
 import Button from '@mui/material/Button'
 
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogContentText from '@mui/material/DialogContentText'
+import DialogTitle from '@mui/material/DialogTitle'
 import { Edit, DeleteForever } from '@mui/icons-material'
 
 import { TransactionDrawer } from '../Drawer'
+import { TrackexContext } from '../../contexts/trackexContext'
 const Table = styled.table`
   width: 100%;
   text-align: left;
@@ -35,10 +41,12 @@ const ActionsCell = styled.td`
 const TransactionsList = () => {
   const [transactions, setTransactions] = useState([])
   const [isOpenDrawer, setIsOpenDrawer] = useState(false)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
   const [mode, setMode] = useState('add')
   const [selectedTransaction, setSelectedTransaction] = useState(null)
 
+  const { categories, types } = useContext(TrackexContext)
   useEffect(() => {
     setTransactions(data)
   }, [])
@@ -87,6 +95,30 @@ const TransactionsList = () => {
     setTransactions(_transactions)
     setSelectedTransaction(null)
   }
+
+  const handleDelete = id => {
+    //we need to find the transaction that we want to delete
+    // we need to open the Dialog
+    const selectedTransaction = transactions.find(
+      transaction => transaction.id === id
+    )
+    setSelectedTransaction(selectedTransaction)
+    setIsDeleteDialogOpen(true)
+  }
+  const deleteTransaction = () => {
+    // filter transactions for all the ones that don't match
+    //update state
+    const _transactions = transactions.filter(
+      transaction => transaction.id !== selectedTransaction.id
+    )
+    setTransactions(_transactions)
+    setIsDeleteDialogOpen(false)
+    setSelectedTransaction(null)
+  }
+
+  const handleCloseDialog = () => setIsDeleteDialogOpen(false)
+  // Dialog -- cancel--> will close the dialog
+  // Dialog -- Delete--> will deleteTransaction + close the dialog
   return (
     <main style={{ width: '100%', padding: '32px' }}>
       <Button
@@ -115,11 +147,18 @@ const TransactionsList = () => {
               <tr key={transaction.id}>
                 <TableCell>{transaction.date}</TableCell>
                 <TableCell>{transaction.name}</TableCell>
-                <TableCell>{transaction.category}</TableCell>
+                <TableCell>
+                  {/* {
+                    categories.find(
+                      category => category.value === transaction.category
+                    ).label
+                  } */}
+                  {categories[transaction.category]}
+                </TableCell>
                 <AmountCell type={transaction.type}>
                   {transaction.amount}
                 </AmountCell>
-                <TableCell>{transaction.type}</TableCell>
+                <TableCell>{types[transaction.type]}</TableCell>
                 <ActionsCell>
                   <Edit
                     onClick={() => {
@@ -129,7 +168,7 @@ const TransactionsList = () => {
                   <DeleteForever
                     style={{ color: '#FF7661' }}
                     onClick={() => {
-                      console.log('Delete transaction')
+                      handleDelete(transaction.id)
                     }}
                   />
                 </ActionsCell>
@@ -146,6 +185,20 @@ const TransactionsList = () => {
         selectedTransaction={selectedTransaction}
         editTransaction={editTransaction}
       />
+      <Dialog open={isDeleteDialogOpen} onClose={handleCloseDialog}>
+        <DialogTitle>
+          Are you sure you want to delete this transaction?
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            If you delete it you won't be able to recover it.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog}>Cancel</Button>
+          <Button onClick={deleteTransaction}>Delete</Button>
+        </DialogActions>
+      </Dialog>
     </main>
   )
 }
