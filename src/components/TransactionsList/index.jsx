@@ -10,6 +10,12 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
 import { Edit, DeleteForever } from '@mui/icons-material'
+import Input from '@mui/material/Input'
+import InputAdornment from '@mui/material/InputAdornment'
+import FormControl from '@mui/material/FormControl'
+import SearchIcon from '@mui/icons-material/Search'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import Checkbox from '@mui/material/Checkbox'
 
 import { TransactionDrawer } from '../Drawer'
 import { TrackexContext } from '../../contexts/trackexContext'
@@ -38,11 +44,22 @@ const ActionsCell = styled.td`
   column-gap: 16px;
 `
 
+const ActionsWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+`
+
+const ContentContainer = styled.div`
+  display: flex;
+`
+const FiltersContainer = styled.div``
 const TransactionsList = () => {
   const [transactions, setTransactions] = useState([])
+  const [filteredTransactions, setFilteredTransactions] = useState([])
   const [isOpenDrawer, setIsOpenDrawer] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
+  const [search, setSearch] = useState('')
   const [mode, setMode] = useState('add')
   const [selectedTransaction, setSelectedTransaction] = useState(null)
 
@@ -50,6 +67,22 @@ const TransactionsList = () => {
   useEffect(() => {
     setTransactions(data)
   }, [])
+
+  useEffect(() => {
+    setFilteredTransactions(transactions)
+  }, [transactions])
+
+  const filterByName = () => {
+    const filteredTransactions = transactions.filter(transaction =>
+      transaction.name.toLowerCase().includes(search)
+    )
+    setFilteredTransactions(filteredTransactions)
+
+    console.log('filteredTransactions', filteredTransactions)
+  }
+  useEffect(() => {
+    filterByName()
+  }, [search])
 
   const saveTransaction = values => {
     let newTransaction = {
@@ -121,84 +154,131 @@ const TransactionsList = () => {
   // Dialog -- Delete--> will deleteTransaction + close the dialog
   return (
     <main style={{ width: '100%', padding: '32px' }}>
-      <Button
-        variant='contained'
-        onClick={() => {
-          setMode('add')
-          setIsOpenDrawer(true)
-        }}
-      >
-        + Add transaction
-      </Button>
-      <Table>
-        <thead>
-          <tr>
-            <HeadCell>Date</HeadCell>
-            <HeadCell>Name</HeadCell>
-            <HeadCell>Category</HeadCell>
-            <HeadCell>Amount</HeadCell>
-            <HeadCell>Type</HeadCell>
-            <HeadCell></HeadCell>
-          </tr>
-        </thead>
-        <tbody>
-          {transactions.map(transaction => {
+      <ActionsWrapper>
+        <FormControl variant='standard'>
+          <Input
+            onChange={e => {
+              setSearch(e.target.value)
+            }}
+            style={{ color: 'white' }}
+            startAdornment={
+              <InputAdornment position='start'>
+                <SearchIcon />
+              </InputAdornment>
+            }
+          />
+        </FormControl>
+        <Button
+          variant='contained'
+          onClick={() => {
+            setMode('add')
+            setIsOpenDrawer(true)
+          }}
+        >
+          + Add transaction
+        </Button>
+      </ActionsWrapper>
+      <ContentContainer>
+        <FiltersContainer>
+          <h2>Filters</h2>
+          <h3>Category</h3>
+          {Object.keys(categories).map(category => {
             return (
-              <tr key={transaction.id}>
-                <TableCell>{transaction.date}</TableCell>
-                <TableCell>{transaction.name}</TableCell>
-                <TableCell>
-                  {/* {
+              <FormControlLabel
+                control={<Checkbox />}
+                label={categories[category]}
+                name={category}
+                onChange={e => {
+                  console.log(e.target.checked)
+                }}
+              />
+            )
+          })}
+          <h3>Type</h3>
+          {Object.keys(types).map(type => {
+            return (
+              <FormControlLabel
+                control={<Checkbox />}
+                label={types[type]}
+                name={type}
+                onChange={e => {
+                  console.log(e.target.checked)
+                }}
+              />
+            )
+          })}
+        </FiltersContainer>
+
+        <Table>
+          <thead>
+            <tr>
+              <HeadCell>Date</HeadCell>
+              <HeadCell>Name</HeadCell>
+              <HeadCell>Category</HeadCell>
+              <HeadCell>Amount</HeadCell>
+              <HeadCell>Type</HeadCell>
+              <HeadCell></HeadCell>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredTransactions.map(transaction => {
+              return (
+                <tr key={transaction.id}>
+                  <TableCell>{transaction.date}</TableCell>
+                  <TableCell>{transaction.name}</TableCell>
+                  <TableCell>
+                    {/* {
                     categories.find(
                       category => category.value === transaction.category
                     ).label
                   } */}
-                  {categories[transaction.category]}
-                </TableCell>
-                <AmountCell type={transaction.type}>
-                  {transaction.amount}
-                </AmountCell>
-                <TableCell>{types[transaction.type]}</TableCell>
-                <ActionsCell>
-                  <Edit
-                    onClick={() => {
-                      handleEdit(transaction.id)
-                    }}
-                  />
-                  <DeleteForever
-                    style={{ color: '#FF7661' }}
-                    onClick={() => {
-                      handleDelete(transaction.id)
-                    }}
-                  />
-                </ActionsCell>
-              </tr>
-            )
-          })}
-        </tbody>
-      </Table>
-      <TransactionDrawer
-        saveTransaction={saveTransaction}
-        isOpen={isOpenDrawer}
-        onClose={onCloseDrawer}
-        mode={mode}
-        selectedTransaction={selectedTransaction}
-        editTransaction={editTransaction}
-      />
-      <Dialog open={isDeleteDialogOpen} onClose={handleCloseDialog}>
-        <DialogTitle>
-          Are you sure you want to delete this transaction?
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            If you delete it you won't be able to recover it.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog}>Cancel</Button>
-          <Button onClick={deleteTransaction}>Delete</Button>
-        </DialogActions>
-      </Dialog>
+                    {categories[transaction.category]}
+                  </TableCell>
+                  <AmountCell type={transaction.type}>
+                    {transaction.amount}
+                  </AmountCell>
+                  <TableCell>{types[transaction.type]}</TableCell>
+                  <ActionsCell>
+                    <Edit
+                      onClick={() => {
+                        handleEdit(transaction.id)
+                      }}
+                    />
+                    <DeleteForever
+                      style={{ color: '#FF7661' }}
+                      onClick={() => {
+                        handleDelete(transaction.id)
+                      }}
+                    />
+                  </ActionsCell>
+                </tr>
+              )
+            })}
+          </tbody>
+        </Table>
+        <TransactionDrawer
+          saveTransaction={saveTransaction}
+          isOpen={isOpenDrawer}
+          onClose={onCloseDrawer}
+          mode={mode}
+          selectedTransaction={selectedTransaction}
+          editTransaction={editTransaction}
+        />
+        <Dialog open={isDeleteDialogOpen} onClose={handleCloseDialog}>
+          <DialogTitle>
+            Are you sure you want to delete this transaction?
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              If you delete it you won't be able to recover it.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseDialog}>Cancel</Button>
+            <Button onClick={deleteTransaction}>Delete</Button>
+          </DialogActions>
+        </Dialog>
+      </ContentContainer>
     </main>
   )
 }
