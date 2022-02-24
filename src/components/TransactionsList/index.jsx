@@ -62,10 +62,49 @@ const TransactionsList = () => {
   const [search, setSearch] = useState('')
   const [mode, setMode] = useState('add')
   const [selectedTransaction, setSelectedTransaction] = useState(null)
-
   const { categories, types } = useContext(TrackexContext)
+
+  const [categoriesFilter, setCategoriesFilter] = useState(
+    Object.keys(categories).reduce((acc, category) => {
+      acc[category] = false
+      return acc
+    }, {})
+  )
+
+  const [typesFilter, setTypesFilter] = useState(
+    Object.keys(types).reduce((acc, type) => {
+      acc[type] = false
+      return acc
+    }, {})
+  )
+
+  /*
+    {
+      eating_out: 'Eating Out',
+      salary: 'Salary'
+    }
+   */
+  // const initCategories = () => {
+  //   /*
+  //   {
+  //     eating_out: true,
+  //     salary: false
+  //   }
+  //  */
+  //   // const obj = {}
+  //   // Object.keys(categories).forEach(category => {
+  //   //   obj[category] = false
+  //   // })
+  //   Object.keys(categories).reduce((acc, category) => {
+  //     console.log(acc)
+  //     acc[category] = false
+  //     return acc
+  //   }, {})
+  // }
+
   useEffect(() => {
     setTransactions(data)
+    // setCategoriesFilter(initCategories())
   }, [])
 
   useEffect(() => {
@@ -83,6 +122,43 @@ const TransactionsList = () => {
   useEffect(() => {
     filterByName()
   }, [search])
+
+  const filterByCategory = () => {
+    console.log('filterByCategory')
+
+    const checked = Object.keys(categoriesFilter).filter(
+      category => categoriesFilter[category]
+    )
+
+    if (checked.length === 0) {
+      setFilteredTransactions(transactions)
+    } else {
+      const filteredTransactions = transactions.filter(
+        transaction => categoriesFilter[transaction.category]
+      )
+      setFilteredTransactions(filteredTransactions)
+    }
+  }
+  useEffect(() => {
+    filterByCategory()
+  }, [categoriesFilter])
+
+  const filterByType = () => {
+    const checked = Object.keys(typesFilter).filter(type => typesFilter[type])
+    console.log('checked', checked)
+    if (checked.length === 0) {
+      setFilteredTransactions(transactions)
+    } else {
+      const filteredTransactions = transactions.filter(
+        transaction => typesFilter[transaction.type]
+      )
+      setFilteredTransactions(filteredTransactions)
+    }
+  }
+  useEffect(() => {
+    console.log('typesFilter', typesFilter)
+    filterByType()
+  }, [typesFilter])
 
   const saveTransaction = values => {
     let newTransaction = {
@@ -189,7 +265,11 @@ const TransactionsList = () => {
                 label={categories[category]}
                 name={category}
                 onChange={e => {
-                  console.log(e.target.checked)
+                  const newCategoriesFilterState = {
+                    ...categoriesFilter,
+                    [category]: e.target.checked,
+                  }
+                  setCategoriesFilter(newCategoriesFilterState)
                 }}
               />
             )
@@ -202,7 +282,10 @@ const TransactionsList = () => {
                 label={types[type]}
                 name={type}
                 onChange={e => {
-                  console.log(e.target.checked)
+                  setTypesFilter({
+                    ...typesFilter,
+                    [type]: e.target.checked,
+                  })
                 }}
               />
             )
