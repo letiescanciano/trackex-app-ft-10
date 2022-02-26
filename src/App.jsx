@@ -30,6 +30,9 @@ const theme = createTheme({
     },
     MuiInput: {
       styleOverrides: {
+        input: {
+          color: '#fff',
+        },
         underline: {
           '&:before': {
             borderBottom: '1px solid #FF7661',
@@ -64,7 +67,21 @@ const theme = createTheme({
     MuiDrawer: {
       styleOverrides: {
         paper: {
-          backgroundColor: 'red',
+          backgroundColor: '#1C2633',
+        },
+      },
+    },
+    MuiInputAdornment: {
+      styleOverrides: {
+        root: {
+          color: 'white',
+        },
+      },
+    },
+    MuiCheckbox: {
+      styleOverrides: {
+        root: {
+          color: 'white',
         },
       },
     },

@@ -47,12 +47,24 @@ const ActionsCell = styled.td`
 const ActionsWrapper = styled.div`
   display: flex;
   justify-content: space-between;
+  column-gap: 16px;
 `
 
 const ContentContainer = styled.div`
   display: flex;
 `
-const FiltersContainer = styled.div``
+const FiltersContainer = styled.div`
+  padding-top: 64px;
+`
+
+const FilterItem = styled.div`
+  background-color: #252f3d;
+  padding: 2px 8px;
+`
+const FilterOptions = styled.div`
+  display: flex;
+  flex-direction: column;
+`
 const TransactionsList = () => {
   const [transactions, setTransactions] = useState([])
   const [filteredTransactions, setFilteredTransactions] = useState([])
@@ -231,7 +243,7 @@ const TransactionsList = () => {
   return (
     <main style={{ width: '100%', padding: '32px' }}>
       <ActionsWrapper>
-        <FormControl variant='standard'>
+        <FormControl variant='standard' style={{ width: '80%' }}>
           <Input
             onChange={e => {
               setSearch(e.target.value)
@@ -257,23 +269,28 @@ const TransactionsList = () => {
       <ContentContainer>
         <FiltersContainer>
           <h2>Filters</h2>
-          <h3>Category</h3>
-          {Object.keys(categories).map(category => {
-            return (
-              <FormControlLabel
-                control={<Checkbox />}
-                label={categories[category]}
-                name={category}
-                onChange={e => {
-                  const newCategoriesFilterState = {
-                    ...categoriesFilter,
-                    [category]: e.target.checked,
-                  }
-                  setCategoriesFilter(newCategoriesFilterState)
-                }}
-              />
-            )
-          })}
+          <FilterItem>
+            <h3>Category</h3>
+            <FilterOptions>
+              {Object.keys(categories).map(category => {
+                return (
+                  <FormControlLabel
+                    control={<Checkbox />}
+                    label={categories[category]}
+                    name={category}
+                    onChange={e => {
+                      const newCategoriesFilterState = {
+                        ...categoriesFilter,
+                        [category]: e.target.checked,
+                      }
+                      setCategoriesFilter(newCategoriesFilterState)
+                    }}
+                  />
+                )
+              })}
+            </FilterOptions>
+          </FilterItem>
+
           <h3>Type</h3>
           {Object.keys(types).map(type => {
             return (

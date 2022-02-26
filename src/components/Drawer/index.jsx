@@ -20,7 +20,6 @@ const FormWrapper = styled.div`
   width: 380px;
   height: 100vh;
   overflow: scroll;
-  background-color: teal;
   color: white;
 `
 const FieldsWrapper = styled.div`
@@ -32,6 +31,11 @@ const ActionsWrapper = styled.div`
   margin-top: 32px;
   display: flex;
   justify-content: space-between;
+`
+
+const RadioOptionsWrapper = styled.div`
+  display: flex;
+  padding-top: 24px;
 `
 
 const TransactionDrawer = ({
@@ -74,7 +78,14 @@ const TransactionDrawer = ({
             onClose()
           }}
         >
-          {({ values, handleChange, errors, isValid, isSubmitting }) => {
+          {({
+            values,
+            handleChange,
+            touched,
+            errors,
+            isValid,
+            isSubmitting,
+          }) => {
             return (
               <>
                 <Form>
@@ -86,8 +97,8 @@ const TransactionDrawer = ({
                       value={values.name}
                       onChange={handleChange}
                       label='Name'
-                      error={Boolean(errors.name)}
-                      helperText={errors.name}
+                      error={touched.name && Boolean(errors.name)}
+                      helperText={touched.name && errors.name}
                     />
 
                     <TextField
@@ -97,8 +108,8 @@ const TransactionDrawer = ({
                       value={values.date}
                       onChange={handleChange}
                       label='Date'
-                      error={Boolean(errors.date)}
-                      helperText={errors.date}
+                      error={touched.date && Boolean(errors.date)}
+                      helperText={touched.date && errors.date}
                     />
 
                     <TextField
@@ -109,11 +120,11 @@ const TransactionDrawer = ({
                       value={values.amount}
                       onChange={handleChange}
                       label='Amount'
-                      error={Boolean(errors.amount)}
-                      helperText={errors.amount}
+                      error={touched.amount && Boolean(errors.amount)}
+                      helperText={touched.amount && errors.amount}
                     />
                   </FieldsWrapper>
-                  <div>
+                  <RadioOptionsWrapper>
                     <FormControl>
                       <FormLabel id='category'>Category</FormLabel>
                       <RadioGroup
@@ -155,7 +166,7 @@ const TransactionDrawer = ({
                         })}
                       </RadioGroup>
                     </FormControl>
-                  </div>
+                  </RadioOptionsWrapper>
                   <ActionsWrapper>
                     <Button variant='outlined' onClick={onClose}>
                       Cancel
