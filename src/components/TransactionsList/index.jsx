@@ -60,6 +60,9 @@ const FiltersContainer = styled.div`
 const FilterItem = styled.div`
   background-color: #252f3d;
   padding: 2px 8px;
+  :last-of-type {
+    margin-top: 16px;
+  }
 `
 const FilterOptions = styled.div`
   display: flex;
@@ -290,23 +293,26 @@ const TransactionsList = () => {
               })}
             </FilterOptions>
           </FilterItem>
-
-          <h3>Type</h3>
-          {Object.keys(types).map(type => {
-            return (
-              <FormControlLabel
-                control={<Checkbox />}
-                label={types[type]}
-                name={type}
-                onChange={e => {
-                  setTypesFilter({
-                    ...typesFilter,
-                    [type]: e.target.checked,
-                  })
-                }}
-              />
-            )
-          })}
+          <FilterItem>
+            <h3>Type</h3>
+            <FilterOptions>
+              {Object.keys(types).map(type => {
+                return (
+                  <FormControlLabel
+                    control={<Checkbox />}
+                    label={types[type]}
+                    name={type}
+                    onChange={e => {
+                      setTypesFilter({
+                        ...typesFilter,
+                        [type]: e.target.checked,
+                      })
+                    }}
+                  />
+                )
+              })}
+            </FilterOptions>
+          </FilterItem>
         </FiltersContainer>
 
         <Table>
