@@ -1,6 +1,7 @@
 const express = require('express')
 const app = express()
 const lodashId = require('lodash-id')
+const cors = require('cors')
 
 const low = require('lowdb')
 const FileSync = require('lowdb/adapters/FileSync')
@@ -9,6 +10,10 @@ const adapter = new FileSync('db.json')
 const db = low(adapter)
 db._.mixin(lodashId)
 
+const corsOptions = {
+  origin: 'http://localhost:3000',
+}
+app.use(cors(corsOptions))
 app.use(express.json())
 // GET /transactions
 app.get('/transactions', (request, response) => {
@@ -47,6 +52,7 @@ app.post('/transactions', (req, res) => {
 
 app.put('/transactions/:id', (req, res) => {
   // Get id from path (params)
+  console.log('req.params', req.params)
   const id = req.params.id
   //Get body from request
   const { name, amount, date, category, type } = req.body

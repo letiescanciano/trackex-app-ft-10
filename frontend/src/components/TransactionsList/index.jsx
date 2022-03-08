@@ -1,5 +1,4 @@
 import { useContext, useEffect, useState } from 'react'
-import data from './data'
 import styled from 'styled-components'
 import { v4 as uuidv4 } from 'uuid'
 import Button from '@mui/material/Button'
@@ -19,6 +18,8 @@ import Checkbox from '@mui/material/Checkbox'
 
 import { TransactionDrawer } from '../Drawer'
 import { TrackexContext } from '../../contexts/trackexContext'
+
+import { transactionsAPI } from '../../services/transactions'
 const Table = styled.table`
   width: 100%;
   text-align: left;
@@ -118,8 +119,26 @@ const TransactionsList = () => {
   // }
 
   useEffect(() => {
-    setTransactions(data)
-    // setCategoriesFilter(initCategories())
+    const getTransactions = async () => {
+      try {
+        const { data, status } = await transactionsAPI.all()
+        if (status === 200) {
+          setTransactions(data)
+        }
+      } catch (e) {
+        console.log(e)
+      }
+    }
+    getTransactions()
+
+    // transactionsAPI
+    //   .all()
+    //   .then(({ data, status }) => {
+    //     if (status === 200) {
+    //       setTransactions(data)
+    //     }
+    //   })
+    //   .catch(error => console.error(error))
   }, [])
 
   useEffect(() => {
@@ -175,17 +194,24 @@ const TransactionsList = () => {
     filterByType()
   }, [typesFilter])
 
-  const saveTransaction = values => {
+  const saveTransaction = async values => {
     let newTransaction = {
       //all information
-      id: uuidv4(),
       name: values.name,
       date: values.date,
       amount: values.amount,
       category: values.category,
       type: values.type,
     }
-    setTransactions([...transactions, newTransaction])
+    try {
+      const { status, data } = await transactionsAPI.create(newTransaction)
+
+      if (status === 201) {
+        setTransactions([...transactions, data])
+      }
+    } catch (e) {
+      console.error(e)
+    }
   }
   const onCloseDrawer = () => setIsOpenDrawer(false)
 
@@ -203,21 +229,29 @@ const TransactionsList = () => {
     setSelectedTransaction(selectedTransaction)
   }
 
-  const editTransaction = values => {
+  const editTransaction = async values => {
     console.log('editTransaction', values)
-    //1. Find the transaction index to edit in the transactions array
-    const transactionIndex = transactions.findIndex(
-      transaction => transaction.id === values.id
-    )
-    // 2. We make a copy of our state
-    const _transactions = [...transactions]
+    try {
+      const { status, data } = await transactionsAPI.update(values)
+      console.log('data from BE', data)
+      if (status === 200) {
+        //1. Find the transaction index to edit in the transactions array
+        const transactionIndex = transactions.findIndex(
+          transaction => transaction.id === data.id
+        )
+        // 2. We make a copy of our state
+        const _transactions = [...transactions]
 
-    // 3. Replace the transaction that we edited
-    _transactions[transactionIndex] = values
+        // 3. Replace the transaction that we edited
+        _transactions[transactionIndex] = data
 
-    //4. Update our state
-    setTransactions(_transactions)
-    setSelectedTransaction(null)
+        //4. Update our state
+        setTransactions(_transactions)
+        setSelectedTransaction(null)
+      }
+    } catch (e) {
+      console.error(e)
+    }
   }
 
   const handleDelete = id => {
