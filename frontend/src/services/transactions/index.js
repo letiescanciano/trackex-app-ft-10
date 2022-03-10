@@ -1,16 +1,13 @@
 import axios from 'axios'
 
-// const service = axios.create({})
+const baseURL = 'http://localhost:3001'
+const service = axios.create({ baseURL })
 
 const transactionsAPI = {
-  all: () => axios.get('http://localhost:3001/transactions'),
-  create: data => {
-    console.log('transaction', data)
-    return axios.post('http://localhost:3001/transactions', data)
-  },
-  update: data => {
-    return axios.put(`http://localhost:3001/transactions/${data.id}`, data)
-  },
+  all: () => service.get('/transactions'),
+  create: data => service.post('/transactions', data),
+  update: data => service.put(`/transactions/${data.id}`, data),
+  delete: id => service.delete(`/transactions/${id}`),
 }
 
 export { transactionsAPI }

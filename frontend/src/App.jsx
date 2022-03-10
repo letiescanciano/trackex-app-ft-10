@@ -1,9 +1,10 @@
 import './App.css'
-
 import { NavBar } from './components/NavBar'
 import { TransactionsList } from './components/TransactionsList'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
 import { TrackexProvider } from './contexts/trackexContext'
+import { Login } from './components/Auth/Login'
+import { AuthProvider } from './contexts/Auth'
 
 const theme = createTheme({
   palette: {
@@ -90,12 +91,15 @@ const theme = createTheme({
 const App = () => {
   return (
     <ThemeProvider theme={theme}>
-      <div className='layout'>
-        <TrackexProvider>
-          <NavBar />
-          <TransactionsList />
-        </TrackexProvider>
-      </div>
+      <AuthProvider>
+        <div className='layout'>
+          <TrackexProvider>
+            {/* <NavBar />
+          <TransactionsList /> */}
+            <Login />
+          </TrackexProvider>
+        </div>
+      </AuthProvider>
     </ThemeProvider>
   )
 }

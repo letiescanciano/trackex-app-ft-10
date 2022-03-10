@@ -263,15 +263,22 @@ const TransactionsList = () => {
     setSelectedTransaction(selectedTransaction)
     setIsDeleteDialogOpen(true)
   }
-  const deleteTransaction = () => {
-    // filter transactions for all the ones that don't match
-    //update state
-    const _transactions = transactions.filter(
-      transaction => transaction.id !== selectedTransaction.id
-    )
-    setTransactions(_transactions)
-    setIsDeleteDialogOpen(false)
-    setSelectedTransaction(null)
+  const deleteTransaction = async () => {
+    try {
+      const response = await transactionsAPI.delete(selectedTransaction.id)
+      if (response.status === 200) {
+        // filter transactions for all the ones that don't match
+        //update state
+        const _transactions = transactions.filter(
+          transaction => transaction.id !== selectedTransaction.id
+        )
+        setTransactions(_transactions)
+        setIsDeleteDialogOpen(false)
+        setSelectedTransaction(null)
+      }
+    } catch (err) {
+      console.log(err)
+    }
   }
 
   const handleCloseDialog = () => setIsDeleteDialogOpen(false)

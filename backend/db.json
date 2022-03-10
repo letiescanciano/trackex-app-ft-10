@@ -1,16 +1,6 @@
 {
   "transactions": [
     {
-      "name": "Coffe",
-      "date": "2021-06-04",
-      "amount": 4.5,
-      "category": "eating_out",
-      "type": "expense",
-      "created_at": "2022-03-01T16:45:47.634Z",
-      "updated_at": "2022-03-01T16:45:47.634Z",
-      "id": "b6830a5a-55b8-42ea-aa17-765bc313d755"
-    },
-    {
       "name": "t-shirts",
       "date": "2021-06-02",
       "amount": 900,
