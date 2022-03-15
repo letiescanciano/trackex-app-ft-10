@@ -26,10 +26,10 @@ const Logo = styled.img`s
   width: 150px;
 `
 
-export const Login = () => {
-  const { login } = useContext(AuthContext)
+export const Signup = () => {
+  const { signup } = useContext(AuthContext)
   const handleSubmit = values => {
-    login(values.email, values.password)
+    signup(values.email, values.password)
   }
   return (
     <Container>
@@ -74,10 +74,10 @@ export const Login = () => {
                   type='submit'
                   disabled={!isValid || isSubmitting}
                 >
-                  Log in
+                  Create Account
                 </Button>
               </Form>
-              <DebugFormik />
+              {/* <DebugFormik /> */}
             </>
           )
         }}

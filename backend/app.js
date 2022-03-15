@@ -2,7 +2,6 @@ const express = require('express')
 const app = express()
 const lodashId = require('lodash-id')
 const cors = require('cors')
-
 const low = require('lowdb')
 const FileSync = require('lowdb/adapters/FileSync')
 
@@ -15,6 +14,7 @@ const corsOptions = {
 }
 app.use(cors(corsOptions))
 app.use(express.json())
+
 // GET /transactions
 app.get('/transactions', (request, response) => {
   const transactions = db.get('transactions').value()

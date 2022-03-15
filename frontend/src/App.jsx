@@ -1,11 +1,11 @@
 import './App.css'
-import { NavBar } from './components/NavBar'
-import { TransactionsList } from './components/TransactionsList'
+
 import { createTheme, ThemeProvider } from '@mui/material/styles'
 import { TrackexProvider } from './contexts/trackexContext'
-import { Login } from './components/Auth/Login'
 import { AuthProvider } from './contexts/Auth'
 
+import { AppRoutes } from './components/AppRoutes'
+import { BrowserRouter } from 'react-router-dom'
 const theme = createTheme({
   palette: {
     primary: {
@@ -90,17 +90,15 @@ const theme = createTheme({
 })
 const App = () => {
   return (
-    <ThemeProvider theme={theme}>
-      <AuthProvider>
-        <div className='layout'>
+    <BrowserRouter>
+      <ThemeProvider theme={theme}>
+        <AuthProvider>
           <TrackexProvider>
-            {/* <NavBar />
-          <TransactionsList /> */}
-            <Login />
+            <AppRoutes />
           </TrackexProvider>
-        </div>
-      </AuthProvider>
-    </ThemeProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </BrowserRouter>
   )
 }
 export default App

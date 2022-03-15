@@ -1,4 +1,6 @@
+import { useContext } from 'react'
 import styled from 'styled-components'
+import { AuthContext } from '../../contexts/Auth'
 
 import logo from './logo.svg'
 
@@ -27,6 +29,7 @@ const Item = styled.li`
 `
 
 const NavBar = props => {
+  const { logout } = useContext(AuthContext)
   return (
     <Container>
       <Logo src={logo} />
@@ -44,6 +47,7 @@ const NavBar = props => {
         <Item>
           <a href='/settings'>Settings</a>
         </Item>
+        <Item onClick={logout}>Log out</Item>
       </List>
     </Container>
   )
