@@ -1,7 +1,14 @@
 import axios from 'axios'
 
+const token = localStorage.getItem('token')
+
 const baseURL = 'http://localhost:3001'
-const service = axios.create({ baseURL })
+const service = axios.create({
+  baseURL,
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+})
 
 const transactionsAPI = {
   all: () => service.get('/transactions'),

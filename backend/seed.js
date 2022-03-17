@@ -1,13 +1,7 @@
-const low = require('lowdb')
-const FileSync = require('lowdb/adapters/FileSync')
-const lodashId = require('lodash-id')
-
-const adapter = new FileSync('db.json')
-const db = low(adapter)
-db._.mixin(lodashId)
-
-db.defaults({ transactions: [] }).write()
-
+require('dotenv').config()
+const mongoose = require('mongoose')
+const Transaction = require('./models/Transaction')
+const firebaseId = 'kzWVea9fd2ZVJdUcYS3V7p4XXcw2'
 const data = [
   {
     id: 2,
@@ -701,17 +695,33 @@ const data = [
   },
 ]
 
-data.forEach(transaction => {
-  db.get('transactions')
-    .insert({
-      name: transaction.name,
-      date: transaction.date,
-      amount: transaction.amount,
-      category: transaction.category.value,
-      type: transaction.type.value,
-      created_at: new Date(),
-      updated_at: new Date(),
-    })
-    .write()
-  console.log(`${transaction.name} Transaction created`)
-})
+mongoose
+  .connect(process.env.DB)
+  .then(async x => {
+    console.log(`Connected to Mongo! Database name: ${x.connections[0].name}`)
+    const transactions = data
+      .map(({ name, date, amount, category, type }) => {
+        if (category.value && type.value) {
+          return {
+            name,
+            date,
+            amount,
+            category: category.value,
+            type: type.value,
+            firebaseId,
+          }
+        }
+      })
+      .filter(Boolean)
+
+    try {
+      const createdTransactions = await Transaction.create(transactions)
+      console.log(
+        `Success! - ${createdTransactions.length} transactions created correctly for user padma@gmail.com`
+      )
+      mongoose.connection.close()
+    } catch (e) {
+      console.log(e)
+    }
+  })
+  .catch(err => console.log(err))
