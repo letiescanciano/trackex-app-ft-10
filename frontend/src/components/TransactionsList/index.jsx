@@ -224,7 +224,7 @@ const TransactionsList = () => {
     setIsOpenDrawer(true)
     // Fill the form with the selected transaction data
     const selectedTransaction = transactions.find(
-      transaction => transaction.id === id
+      transaction => transaction._id === id
     )
     setSelectedTransaction(selectedTransaction)
   }
@@ -237,7 +237,7 @@ const TransactionsList = () => {
       if (status === 200) {
         //1. Find the transaction index to edit in the transactions array
         const transactionIndex = transactions.findIndex(
-          transaction => transaction.id === data.id
+          transaction => transaction._id === data._id
         )
         // 2. We make a copy of our state
         const _transactions = [...transactions]
@@ -258,19 +258,19 @@ const TransactionsList = () => {
     //we need to find the transaction that we want to delete
     // we need to open the Dialog
     const selectedTransaction = transactions.find(
-      transaction => transaction.id === id
+      transaction => transaction._id === id
     )
     setSelectedTransaction(selectedTransaction)
     setIsDeleteDialogOpen(true)
   }
   const deleteTransaction = async () => {
     try {
-      const response = await transactionsAPI.delete(selectedTransaction.id)
+      const response = await transactionsAPI.delete(selectedTransaction._id)
       if (response.status === 200) {
         // filter transactions for all the ones that don't match
         //update state
         const _transactions = transactions.filter(
-          transaction => transaction.id !== selectedTransaction.id
+          transaction => transaction._id !== selectedTransaction._id
         )
         setTransactions(_transactions)
         setIsDeleteDialogOpen(false)
@@ -370,7 +370,7 @@ const TransactionsList = () => {
           <tbody>
             {filteredTransactions.map(transaction => {
               return (
-                <tr key={transaction.id}>
+                <tr key={transaction._id}>
                   <TableCell>{transaction.date}</TableCell>
                   <TableCell>{transaction.name}</TableCell>
                   <TableCell>
@@ -388,13 +388,13 @@ const TransactionsList = () => {
                   <ActionsCell>
                     <Edit
                       onClick={() => {
-                        handleEdit(transaction.id)
+                        handleEdit(transaction._id)
                       }}
                     />
                     <DeleteForever
                       style={{ color: '#FF7661' }}
                       onClick={() => {
-                        handleDelete(transaction.id)
+                        handleDelete(transaction._id)
                       }}
                     />
                   </ActionsCell>

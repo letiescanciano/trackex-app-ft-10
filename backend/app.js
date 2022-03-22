@@ -4,6 +4,8 @@ const app = express()
 const cors = require('cors')
 const mongoose = require('mongoose')
 const authMiddleware = require('./middlewares/auth')
+
+const Transaction = require('./models/Transaction')
 const corsOptions = {
   origin: 'http://localhost:3000',
 }
@@ -18,9 +20,16 @@ app.use(cors(corsOptions))
 app.use(express.json())
 app.use(authMiddleware)
 // GET /transactions
-app.get('/transactions', (request, response) => {
-  console.log('requ', request.firebaseUser)
-  response.status(200).json(request.firebaseUser)
+app.get('/transactions', async (req, res) => {
+  try {
+    const transactions = await Transaction.find({
+      firebaseId: req.firebaseUser.uid,
+    })
+
+    res.status(200).json(transactions)
+  } catch (error) {
+    res.status(404).json({ message: 'Bad request' })
+  }
 })
 
 // app.get('/transactions/:id', (req, res) => {
@@ -35,61 +44,65 @@ app.get('/transactions', (request, response) => {
 //   }
 // })
 
-// app.post('/transactions', (req, res) => {
-//   console.log('req.body', req.body)
-//   const transaction = {
-//     name: req.body.name,
-//     amount: req.body.amount,
-//     date: req.body.date,
-//     category: req.body.category,
-//     type: req.body.type,
-//     created_at: new Date(),
-//     updated_at: new Date(),
-//   }
+app.post('/transactions', async (req, res) => {
+  console.log('req.body', req.body)
+  const { name, amount, date, category, type } = req.body
+  const transaction = {
+    name,
+    amount,
+    date,
+    category,
+    type,
+    firebaseId: req.firebaseUser.uid,
+  }
 
-//   const createdTransaction = db.get('transactions').insert(transaction).write()
+  try {
+    const createdTransaction = await Transaction.create(transaction)
+    res.status(201).json(createdTransaction)
+  } catch (error) {
+    res.status(404).json(error.message)
+  }
+})
 
-//   res.status(201).json(createdTransaction)
-// })
+app.put('/transactions/:id', async (req, res) => {
+  // Get id from path (params)
+  console.log('req.params', req.params)
+  const { id } = req.params
+  //Get body from request
+  const { name, amount, date, category, type } = req.body
+  // Find the transaction with by id from the database
+  // if it matches, we'll update the transaction
 
-// app.put('/transactions/:id', (req, res) => {
-//   // Get id from path (params)
-//   console.log('req.params', req.params)
-//   const id = req.params.id
-//   //Get body from request
-//   const { name, amount, date, category, type } = req.body
-//   // Find the transaction with by id from the database
-//   // if it matches, we'll update the transaction
-//   const updatedTransaction = db
-//     .get('transactions')
-//     .updateById(id, {
-//       name,
-//       amount,
-//       date,
-//       category,
-//       type,
-//       updated_at: new Date(),
-//     })
-//     .write()
+  try {
+    const updatedTransaction = await Transaction.findByIdAndUpdate(
+      id,
+      { name, amount, date, category, type },
+      { new: true }
+    )
+    if (updatedTransaction) {
+      res.status(200).json(updatedTransaction)
+    } else {
+      res.status(404).json({ message: 'That transaction does not exist' })
+    }
+  } catch (error) {
+    res.status(404).json(error.message)
+  }
+})
 
-//   if (updatedTransaction) {
-//     res.status(200).json(updatedTransaction)
-//   } else {
-//     res.status(404).json({ message: 'That transaction does not exist' })
-//   }
-// })
+app.delete('/transactions/:id', async (req, res) => {
+  const { id } = req.params
 
-// app.delete('/transactions/:id', (req, res) => {
-//   const { id } = req.params
-
-//   const deletedTransaction = db.get('transactions').removeById(id).write()
-
-//   console.log('deletedTransaction', deletedTransaction)
-//   if (deletedTransaction) {
-//     res.status(200).json(deletedTransaction)
-//   } else {
-//     res.status(404).json({ message: 'That transaction does not exist' })
-//   }
-// })
+  try {
+    const deletedTransaction = await Transaction.findByIdAndRemove(id)
+    console.log(deletedTransaction)
+    if (deletedTransaction) {
+      res.status(200).json(deletedTransaction)
+    } else {
+      res.status(404).json({ message: 'That transaction does not exist' })
+    }
+  } catch (error) {
+    res.status(404).json(error.message)
+  }
+})
 
 app.listen(3001, () => console.log('Server listening on port 3001'))

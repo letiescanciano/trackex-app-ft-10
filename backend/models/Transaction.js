@@ -10,7 +10,10 @@ const transactionSchema = new mongoose.Schema(
     amount: Number,
     category: String,
     type: String,
-    firebaseId: String,
+    firebaseId: {
+      type: String,
+      required: true,
+    },
   },
   {
     timestamps: {
