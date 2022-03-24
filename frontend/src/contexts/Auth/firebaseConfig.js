@@ -4,6 +4,7 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut,
+  onAuthStateChanged,
 } from 'firebase/auth'
 
 initializeApp({
@@ -22,6 +23,7 @@ const firebase = {
     createUserWithEmailAndPassword(auth, email, password),
   login: (email, password) => signInWithEmailAndPassword(auth, email, password),
   logout: () => signOut(auth),
+  getCurrentUser: callback => onAuthStateChanged(auth, user => callback(user)),
 }
 
 export default firebase

@@ -6,6 +6,7 @@ export const AuthContext = createContext({})
 
 export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState(null)
+  const [error, setError] = useState(null)
   const navigate = useNavigate()
 
   const signup = async (email, password) => {
@@ -28,10 +29,11 @@ export const AuthProvider = ({ children }) => {
     console.log('login', email, password)
     try {
       const userCredential = await firebase.login(email, password)
-      console.log('userCred', userCredential)
+      console.log('userCred login', userCredential)
       const { user } = userCredential
 
       user.getIdToken().then(token => {
+        console.log('settingtoken')
         localStorage.setItem('token', token)
       })
 
@@ -39,6 +41,7 @@ export const AuthProvider = ({ children }) => {
       navigate('/transactions')
     } catch (e) {
       console.log(e)
+      setError('Wrong credentials')
     }
   }
 
@@ -47,13 +50,17 @@ export const AuthProvider = ({ children }) => {
     try {
       await firebase.logout()
       setAuth(null)
+      localStorage.removeItem('token')
       navigate('/')
     } catch (e) {
       console.log(e)
+      setError(e)
     }
   }
   return (
-    <AuthContext.Provider value={{ auth, signup, login, logout }}>
+    <AuthContext.Provider
+      value={{ auth, setAuth, error, signup, login, logout }}
+    >
       {children}
     </AuthContext.Provider>
   )

@@ -5,6 +5,7 @@ import { TrackexProvider } from './contexts/trackexContext'
 import { AuthProvider } from './contexts/Auth'
 
 import { AppRoutes } from './components/AppRoutes'
+import { AuthStateChanged } from './components/AuthStateChanged'
 import { BrowserRouter } from 'react-router-dom'
 const theme = createTheme({
   palette: {
@@ -93,9 +94,11 @@ const App = () => {
     <BrowserRouter>
       <ThemeProvider theme={theme}>
         <AuthProvider>
-          <TrackexProvider>
-            <AppRoutes />
-          </TrackexProvider>
+          <AuthStateChanged>
+            <TrackexProvider>
+              <AppRoutes />
+            </TrackexProvider>
+          </AuthStateChanged>
         </AuthProvider>
       </ThemeProvider>
     </BrowserRouter>
