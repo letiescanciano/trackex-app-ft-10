@@ -7,7 +7,10 @@ const authMiddleware = require('./middlewares/auth')
 
 const Transaction = require('./models/Transaction')
 const corsOptions = {
-  origin: 'http://localhost:3000',
+  origin: [
+    'http://localhost:3000',
+    'http://ft-10-trackex-app.s3-website.eu-central-1.amazonaws.com',
+  ],
 }
 
 mongoose
